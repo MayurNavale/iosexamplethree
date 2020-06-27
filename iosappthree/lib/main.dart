@@ -1,43 +1,66 @@
+
+import 'earth_page.dart';
+
+
 import 'package:flutter/material.dart';
-import 'package:arkit_plugin/arkit_plugin.dart';
-import 'package:vector_math/vector_math_64.dart';
 
+void main() => runApp(MaterialApp(home: MyApp()));
 
-void main()=>runApp(App());
-class App extends StatelessWidget {
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Title',
-      //theme: kThemeData,
-      home: MyApp(),
+    final samples = [
+     
+      Sample(
+        'Earth',
+        'Sphere with an image texture and rotation animation.',
+        Icons.language,
+        () => Navigator.of(context)
+            .push<void>(MaterialPageRoute(builder: (c) => EarthPage())),
+      ),
+           
+   
+    ];
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('ARKit Demo'),
+      ),
+      body:
+          ListView(children: samples.map((s) => SampleItem(item: s)).toList()),
     );
   }
 }
 
-class MyApp extends StatefulWidget {
+class SampleItem extends StatelessWidget {
+  const SampleItem({Key key, this.item}) : super(key: key);
+  final Sample item;
+
   @override
-  _MyAppState createState() => _MyAppState();
+  Widget build(BuildContext context) {
+    return Card(
+      child: InkWell(
+        onTap: () => item.onTap(),
+        child: ListTile(
+          leading: Icon(item.icon),
+          title: Text(
+            item.title,
+            style: Theme.of(context).textTheme.subhead,
+          ),
+          subtitle: Text(
+            item.description,
+            style: Theme.of(context).textTheme.subtitle,
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-class _MyAppState extends State<MyApp> {
-  ARKitController arkitController;
-
-  @override
-  void dispose() {
-    arkitController?.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => Scaffold(
-      appBar: AppBar(title: const Text('ARKit in Flutter')),
-      body: ARKitSceneView(onARKitViewCreated: onARKitViewCreated));
-
-  void onARKitViewCreated(ARKitController arkitController) {
-    this.arkitController = arkitController;
-    final node = ARKitNode(
-        geometry: ARKitSphere(radius: 0.1), position: Vector3(0, 0, -0.5));
-    this.arkitController.add(node);
-  }
+class Sample {
+  const Sample(this.title, this.description, this.icon, this.onTap);
+  final String title;
+  final String description;
+  final IconData icon;
+  final Function onTap;
 }
